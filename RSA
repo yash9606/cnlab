@@ -1,31 +1,41 @@
 import java.math.BigInteger;
-public class RSA {
+import java.security.SecureRandom;
+public class SimpleRSA {
+private BigInteger n; // Modulus
+private BigInteger d; // Private key
+private BigInteger e; // Public key
+private int bitLength = 1024; // Key size
+// Constructor to generate keys
+public SimpleRSA() {
+SecureRandom random = new SecureRandom();
+BigInteger p = new BigInteger(bitLength / 2, 100, random);
+BigInteger q = new BigInteger(bitLength / 2, 100, random);
+n = p.multiply(q);
+BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+e = new BigInteger("65537"); // Commonly used public key
+d = e.modInverse(phi); // Private key
+}
+// Encrypt a message
+public BigInteger encrypt(BigInteger message) {
+return message.modPow(e, n);
+}
+// Decrypt a message
+public BigInteger decrypt(BigInteger ciphertext) {
+return ciphertext.modPow(d, n);
+}
 public static void main(String[] args) {
-// Key generation
-BigInteger p = BigInteger.valueOf(61);
-BigInteger q = BigInteger.valueOf(53);
-
-BigInteger n = p.multiply(q);
-BigInteger phi = p.subtract(BigInteger.ONE).
-BigInteger e = BigInteger.valueOf(17);
-BigInteger d = e.modInverse(phi);
-// Public key
-System.out.println("Public Key: (" + e + ", " + n + ")");
-// Private key
-System.out.println("Private Key: (" + d + ", " + n + ")");
-// Encryption
-String message = "HELLO";
-BigInteger[] ciphertext = new BigInteger[message.length()];
-for (int i = 0; i < message.length(); i++) {
-BigInteger m = BigInteger.valueOf(message.
-ciphertext[i] = m.modPow(e, n);
-}
-// Decryption
-String decrypted = "";
-for (BigInteger c : ciphertext) {
-BigInteger m = c.modPow(d, n);
-decrypted += (char) m.intValue();
-}
-System.out.println("Decrypted: " + decrypted);
+SimpleRSA rsa = new SimpleRSA();
+String plaintext = "Hello RSA!";
+System.out.println("Original Message: " + plaintext);
+// Convert plaintext to a BigInteger
+BigInteger message = new BigInteger(plaintext.getBytes());
+System.out.println("Plaintext as BigInteger: " + message);
+// Encrypt the message
+BigInteger ciphertext = rsa.encrypt(message);
+System.out.println("Encrypted Message: " + ciphertext);
+// Decrypt the message
+BigInteger decrypted = rsa.decrypt(ciphertext);
+String decryptedMessage = new String(decrypted.toByteArray());
+System.out.println("Decrypted Message: " + decryptedMessage);
 }
 }
